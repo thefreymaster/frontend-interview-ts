@@ -18,8 +18,9 @@ const generatePixels = (count) => {
   }));
 };
 
-app.get("/pixels", (req, res) => {
-  res.status(201).json(generatePixels(1000));
+app.get("/api/v1/pixels", (req, res) => {
+  const pixels = generatePixels(1000);
+  res.send(pixels)
 });
 
 // 404 route
