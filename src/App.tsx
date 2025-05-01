@@ -1,4 +1,4 @@
-import { Pixels } from "./components/Pixels";
+import Pixels from "./components/Pixels";
 
 
 function App() {
