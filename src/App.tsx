@@ -1,10 +1,9 @@
-import Pixels from "./components/Pixels";
-
+import { Pixels } from "./components/Pixels";
 
 function App() {
   return (
     <>
-      <span>Pixel Display</span>
+      <h1>Pixel Display</h1>
       <Pixels />
     </>
   );
