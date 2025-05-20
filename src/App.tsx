@@ -1,12 +1,14 @@
-import { Pixels } from "./components/Pixels";
+import "./App.css";
 
-function App() {
+import { api } from "./api/api";
+import { IVendor } from "./interfaces/vendors";
+
+const App = () => {
   return (
-    <>
-      <h1>Pixel Display</h1>
-      <Pixels />
-    </>
+    <section className="App">
+      <nav>Vendors</nav>
+    </section>
   );
-}
+};
 
 export default App;

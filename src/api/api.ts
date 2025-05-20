@@ -1,10 +1,13 @@
-import axios from "axios";
+import { Vendors } from "./mockResponse";
 
-const pixels = async () => {
-  const res = await axios.get("/api/v1/pixels")
-  return res.data;
+export const getVendors = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(Vendors);
+    }, 1000);
+  });
 };
 
 export const api = {
-  pixels,
+  vendors: getVendors,
 };
