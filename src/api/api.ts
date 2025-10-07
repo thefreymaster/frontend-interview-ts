@@ -1,6 +1,6 @@
 import { Vendors } from "./mockResponse";
 
-export const getVendors = () => {
+export const get = () => {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(Vendors);
@@ -9,5 +9,5 @@ export const getVendors = () => {
 };
 
 export const api = {
-  vendors: getVendors,
+  vendors: { get },
 };
