@@ -1,13 +1,13 @@
-import { Vendors } from "./mockResponse";
+import { Merchants } from "./mockResponse";
 
 export const get = () => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(Vendors);
+      resolve(Merchants);
     }, 1000);
   });
 };
 
 export const api = {
-  vendors: { get },
+  merchants: { get },
 };

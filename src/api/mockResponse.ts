@@ -1,4 +1,4 @@
-export const Vendors = [
+export const Merchants = [
   {
     location: {
       address: "123 Main St",

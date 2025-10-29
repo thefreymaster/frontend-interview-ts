@@ -1,14 +1,9 @@
-import "./App.css";
-
-import { api } from "./api/api";
-import { Header } from "./components/Header/Header";
-import { Vendor } from "./components/Vendor/Vendor";
-import { IVendor } from "./interfaces/vendors";
+import { Router } from "./router/router";
 
 const App = () => {
   return (
     <section className="App">
-      <Header />
+      <Router />
     </section>
   );
 };
