@@ -21,6 +21,3 @@ Create an application that fetches a list of merchants, displays the merchants, 
    3c. Display the `account_owner`, `datetime`, and `amount`
    3d. Format `datetime` ISO format 
 4. Implement merchant search functionality on the MerchantList component
-
-### Stretch Goals
-4. Search functionality that allows the user to filter the list of merchants
