@@ -25,4 +25,10 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    files: ['index.ts', 'openapi.ts'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
 )

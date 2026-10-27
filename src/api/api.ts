@@ -1,13 +1,6 @@
-import { Merchants } from "./mockResponse";
-
-export const get = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(Merchants);
-    }, 1000);
-  });
-};
+export const get = () => {};
+export const getById = (_id: string) => {};
 
 export const api = {
-  merchants: { get },
+  pixels: { get, getById },
 };

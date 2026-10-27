@@ -1,13 +1,117 @@
-#root {
-    height: 100vh;
-    width: 100vw;
+:root {
+  color-scheme: dark;
+  --color-background: #101112;
+  --color-surface: #17191b;
+  --color-surface-hover: #26292c;
+  --color-border: #2c2f32;
+  --color-text: #c9cccf;
+  --color-text-muted: #898f95;
+  --color-accent: #65c975;
+  --color-accent-surface: #1a2c20;
+  --color-accent-border: #2e5038;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-background);
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html,
 body {
-    margin: 0px;
-    background-color: #1f1f1f;
+  margin: 0;
+  min-width: 320px;
+  min-height: 100%;
 }
 
-div {
-    color: white;
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 4px 16px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.app-header__logo {
+  display: block;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.app-header__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.app-header__tag {
+  margin-left: auto;
+  padding: 2px 6px;
+  border: 1px solid var(--color-accent-border);
+  background: var(--color-accent-surface);
+  color: var(--color-accent);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  margin: 8px;
+  padding: clamp(12px, 2vw, 24px);
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+
+a {
+  color: var(--color-text-muted);
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: var(--color-text);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+button:not(:disabled):hover {
+  background: var(--color-surface-hover);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: var(--color-text);
+  background: var(--color-accent-border);
 }

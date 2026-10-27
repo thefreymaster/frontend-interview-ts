@@ -1,15 +1,15 @@
 import { createBrowserRouter, Outlet } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import { Header } from "../components/Header/Header";
-import { Merchant } from "../components/Merchant/Merchant";
-import { MerchantsList } from "../components/MerchantsList/MerchantsList";
+import { Pixel } from "../components/Pixel/Pixel";
+import { Pixels } from "../components/Pixels/Pixels";
 
 const Layout = () => (
   <>
     <Header />
-    <section style={{ padding: "1rem" }}>
+    <main className="app-main" aria-label="Interview workspace">
       <Outlet />
-    </section>
+    </main>
   </>
 );
 
@@ -19,12 +19,16 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        path: "/",
-        element: <MerchantsList />,
+        index: true,
+        element: <Pixels />,
       },
       {
-        path: "/:merchant_id",
-        element: <Merchant />,
+        path: "pixels",
+        element: <Pixels />,
+      },
+      {
+        path: "pixels/:id",
+        element: <Pixel />,
       },
     ],
   },

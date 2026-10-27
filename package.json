@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server": "node index.ts"
+    "server": "tsx index.ts",
+    "typecheck:server": "tsc -p tsconfig.server.json"
   },
   "dependencies": {
     "@tanstack/react-query": "5.102.*",
@@ -16,7 +17,8 @@
     "react": "19.0.*",
     "react-dom": "19.0.*",
     "react-router": "7.9.*",
-    "styled-components": "6.1.*5"
+    "styled-components": "6.1.*5",
+    "swagger-ui-express": "5.0.*"
   },
   "devDependencies": {
     "@eslint/js": "9.21.*",
@@ -24,6 +26,7 @@
     "@types/node": "22.13.*",
     "@types/react": "19.3.*",
     "@types/react-dom": "19.3.*",
+    "@types/swagger-ui-express": "4.1.*",
     "@vitejs/plugin-react": "4.3.*",
     "eslint": "9.21.*",
     "eslint-plugin-react-hooks": "5.1.*",
@@ -31,6 +34,7 @@
     "globals": "15.15.*",
     "nodemon": "3.1.*",
     "ts-node": "10.9.*",
+    "tsx": "4.23.*",
     "typescript": "~5.7.2",
     "typescript-eslint": "8.24.*",
     "vite": "6.2.*",
