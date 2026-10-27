@@ -9,6 +9,10 @@ export default defineConfig({
     host: "localhost",
     proxy: {
       "/api/v1": "http://localhost:4090",
+      "/socket.io": {
+        target: "http://localhost:4090",
+        ws: true,
+      },
     },
   },
 });

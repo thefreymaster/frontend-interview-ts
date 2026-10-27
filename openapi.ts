@@ -4,7 +4,7 @@ export const openApiDocument = {
     title: "Interview Mock API",
     version: "1.0.0",
     description:
-      "Mock pixel and user data for local development. No authentication is required.",
+      "Mock pixel and user data for local development. Socket.IO also streams pixel quality changes every five seconds in a repeating one-minute cycle; see the README for event documentation. No authentication is required.",
   },
   servers: [{ url: "/", description: "Current API server" }],
   tags: [
@@ -18,7 +18,7 @@ export const openApiDocument = {
         operationId: "getPixels",
         summary: "Get 10,000 pixels for a 100 by 100 grid",
         description:
-          "Hypothetical interview data generated when the server starts and kept stable until restart. Each pixel has a 90% probability of being healthy and RGB sub-pixel values from 0 to 255.",
+          "Regenerates hypothetical interview data on every request with exactly 9,400 green pixels (94%), 500 yellow pixels (5%), and 100 red pixels (1%). Color assignments are shuffled while IDs stay fixed. Intensity and RGB sub-pixel values are randomized. Green pixels are healthy; yellow and red pixels are not. Resets the quality simulation and broadcasts the new snapshot to connected Socket.IO clients.",
         responses: {
           "200": {
             description: "An array of 10,000 pixels with sequential IDs",
@@ -41,7 +41,8 @@ export const openApiDocument = {
         tags: ["Pixels"],
         operationId: "getPixel",
         summary: "Get a pixel by ID",
-        description: "Returns the same pixel data as the list endpoint.",
+        description:
+          "Returns the pixel from the current live state shared across clients, including Socket.IO quality changes. Before the first list request, uses startup data and the running simulation. Detail requests do not regenerate data.",
         parameters: [
           {
             name: "id",
@@ -104,7 +105,11 @@ export const openApiDocument = {
         required: ["id", "healthy", "meta_data", "sub_pixels"],
         properties: {
           id: { type: "integer", minimum: 1, maximum: 10000, example: 1 },
-          healthy: { type: "boolean", example: true },
+          healthy: {
+            type: "boolean",
+            description: "True for green pixels, false for yellow or red pixels",
+            example: true,
+          },
           meta_data: {
             type: "object",
             required: ["intensity", "color"],
@@ -117,8 +122,9 @@ export const openApiDocument = {
               },
               color: {
                 type: "string",
-                enum: ["red", "yellow", "blue"],
-                example: "blue",
+                enum: ["green", "yellow", "red"],
+                description: "94% green, 5% yellow, and 1% red in each list response",
+                example: "green",
               },
             },
           },

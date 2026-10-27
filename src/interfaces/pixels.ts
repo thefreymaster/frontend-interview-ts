@@ -3,7 +3,7 @@ export interface IPixel {
   healthy: boolean;
   meta_data: {
     intensity: number;
-    color: "red" | "yellow" | "blue";
+    color: "green" | "yellow" | "red";
   };
   sub_pixels: {
     red: number;
