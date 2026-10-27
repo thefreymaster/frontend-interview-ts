@@ -1,4 +1,4 @@
-import { Router } from "./router/router";
+import { Router } from "./router";
 
 const App = () => {
   return (
