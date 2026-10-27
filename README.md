@@ -53,13 +53,23 @@ Socket.IO -> usePixelUpdates -> React Query cache -> pixel UI
 
 ## Local Development
 
-Use Node.js 24. With nvm installed, select the version pinned in `.nvmrc`
-and install dependencies, including dev dependencies:
+After cloning, run the setup script from the repository root:
 
 ```bash
-nvm install
-nvm use
-npm ci
+bash setup.sh
+```
+
+The script installs nvm v0.40.8 if missing using the official installer, loads
+nvm, installs the Node 24 version pinned in `.nvmrc`, sets Node 24 as your default,
+and installs dependencies including dev dependencies. It requires Bash, curl,
+internet access, and permission to write to your nvm directory (normally
+`$HOME/.nvm`). Existing nvm installations are reused.
+
+Open a new terminal afterward, or activate nvm and Node 24 in the current one:
+
+```bash
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh" && nvm use
 ```
 
 `package.json` requires Node 24, and `.npmrc` enables strict engine checks so
@@ -162,22 +172,16 @@ Other available commands:
 ## HackerRank Setup
 
 The repository's Node version requirement does not change HackerRank's runtime
-automatically. In a project workspace with nvm installed, configure the
-initialization/setup command to run the following from the repository root:
+automatically. If the project workspace permits installing nvm and Node,
+configure its initialization/setup command to run this from the repository root:
 
 ```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh" &&
-nvm install &&
-nvm use &&
-nvm alias default 24 &&
-node --version &&
-npm ci
+bash setup.sh
 ```
 
-The version output must start with `v24.`. Setup and application commands may
-run in separate shells, so explicitly load nvm and select the pinned version
-in each startup command as well.
+The script checks that the active Node version is 24. Setup and application
+commands may run in separate shells, so explicitly load nvm and select the
+pinned version in each startup command as well.
 
 Frontend startup command:
 
@@ -202,10 +206,10 @@ export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 . "$NVM_DIR/nvm.sh" && nvm use && npm run server
 ```
 
-If nvm is unavailable or installing Node is prohibited, the question owner
-must provide a workspace with Node 24. For a standard coding question rather
-than a project workspace, the Node version is controlled by HackerRank's
-available language runtimes, not these repository files.
+If installing nvm or Node is prohibited and Node 24 is not already available,
+the question owner must provide a workspace with Node 24. For a standard coding
+question rather than a project workspace, the Node version is controlled by
+HackerRank's available language runtimes, not these repository files.
 
 ## Interview Exercise
 
