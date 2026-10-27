@@ -130,7 +130,7 @@ app.get("/api/v1/user", (_req, res: Response<User>) => {
   res.json(mockUser);
 });
 
-app.get("/api-docs.json", (_req, res) => {
+app.get(["/api/v1/docs.json", "/api-docs.json"], (_req, res) => {
   res.json(openApiDocument);
 });
 
@@ -138,7 +138,7 @@ app.use(
   "/api/v1/docs",
   swaggerUi.serve,
   swaggerUi.setup(undefined, {
-    swaggerOptions: { url: "/api-docs.json" },
+    swaggerOptions: { url: "/api/v1/docs.json" },
   }),
 );
 

@@ -5,8 +5,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5090,
+    port: 3000,
     host: "localhost",
+    // HackerRank forwards preview requests using internal VM hostnames.
+    allowedHosts: [".vm-provider.internal"],
     proxy: {
       "/api/v1": "http://localhost:4090",
       "/socket.io": {

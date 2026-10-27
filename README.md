@@ -82,7 +82,12 @@ HTTP/WebSocket traffic to the backend.
 Backend documentation URLs:
 
 - Swagger UI: `http://localhost:4090/api/v1/docs`
-- OpenAPI JSON: `http://localhost:4090/api-docs.json`
+- OpenAPI JSON: `http://localhost:4090/api/v1/docs.json`
+
+Both documentation paths work through the frontend proxy as well. In
+HackerRank, append `/api/v1/docs` to the frontend preview URL; Swagger fetches
+its definition from `/api/v1/docs.json`, which uses the same API proxy.
+The legacy `/api-docs.json` path remains available directly on the backend.
 
 The server defines these endpoints. All use `GET` and require no authentication:
 
@@ -178,8 +183,17 @@ Frontend startup command:
 
 ```bash
 export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh" && nvm use && npm run dev
+. "$NVM_DIR/nvm.sh" && nvm use && npm run dev -- --host 0.0.0.0 --port 3000 --strictPort
 ```
+
+Open the **Ports** panel and use the preview action for port `3000`. HackerRank
+exposes predefined ports; the local default `5090` is not exposed in this
+workspace. Do not open the container's private IP address directly.
+
+`vite.config.ts` allows `.vm-provider.internal`, the internal hostname suffix
+used by HackerRank's preview proxy. If Vite reports a blocked host, confirm this
+setting is present in the HackerRank copy and restart Vite. Keep host checking
+enabled rather than setting `allowedHosts: true`.
 
 Backend startup command:
 

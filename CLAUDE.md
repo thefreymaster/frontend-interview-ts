@@ -94,7 +94,8 @@ The interview exercise, not the current scaffold, should satisfy these requireme
 - `/api/v1/pixels/:id`: Returns the matching pixel from the current live state or a JSON 404
 - `/api/v1/user`: Returns a fixed mock user profile
 - `/api/v1/docs`: Serves Swagger UI
-- `/api-docs.json`: Serves the OpenAPI specification
+- `/api/v1/docs.json`: Serves the OpenAPI specification through the API proxy
+- `/api-docs.json`: Legacy OpenAPI specification path available directly on the backend
 - `/socket.io`: Socket.IO HTTP/WebSocket transport for pixel events
 
 ## Development Notes
