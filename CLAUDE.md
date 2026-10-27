@@ -27,7 +27,7 @@ npm run dev
 npm run server
 ```
 
-The frontend is configured for `http://localhost:5090` and the backend API server for `http://localhost:4090`. Vite proxies `/api/v1` and `/socket.io` HTTP/WebSocket requests to the backend.
+The frontend is configured for `http://localhost:3000` and the backend API server for `http://localhost:4090`. Vite proxies `/api/v1` and `/socket.io` HTTP/WebSocket requests to the backend. `npm run dev` starts only the frontend; run `npm run server` separately. Vite fails on an occupied port rather than automatically selecting another port.
 
 ### Building the Application
 

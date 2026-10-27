@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
+    strictPort: true,
     host: "localhost",
     // HackerRank forwards preview requests using internal VM hostnames.
     allowedHosts: [".vm-provider.internal"],

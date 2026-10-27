@@ -85,9 +85,15 @@ npm run server
 npm run dev
 ```
 
-The frontend is configured for `http://localhost:5090`. The backend is configured
+The frontend is configured for `http://localhost:3000`. The backend is configured
 for `http://localhost:4090`. Vite proxies `/api/v1` requests and `/socket.io`
 HTTP/WebSocket traffic to the backend.
+
+`npm run dev` starts only the frontend. Keep `npm run server` running in the
+second terminal for API, Swagger, and Socket.IO requests to work. Vite fails
+if port `3000` is occupied instead of silently moving to an unexposed port.
+For local development alongside another project, choose an unused frontend
+port with `npm run dev -- --port 3001`.
 
 Backend documentation URLs:
 
@@ -187,12 +193,11 @@ Frontend startup command:
 
 ```bash
 export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh" && nvm use && npm run dev -- --host 0.0.0.0 --port 3000 --strictPort
+. "$NVM_DIR/nvm.sh" && nvm use && npm run dev
 ```
 
 Open the **Ports** panel and use the preview action for port `3000`. HackerRank
-exposes predefined ports; the local default `5090` is not exposed in this
-workspace. Do not open the container's private IP address directly.
+exposes predefined ports. Do not open the container's private IP address directly.
 
 `vite.config.ts` allows `.vm-provider.internal`, the internal hostname suffix
 used by HackerRank's preview proxy. If Vite reports a blocked host, confirm this
@@ -205,6 +210,14 @@ Backend startup command:
 export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 . "$NVM_DIR/nvm.sh" && nvm use && npm run server
 ```
+
+Keep the backend running in a separate terminal; port `4090` does not need a
+public preview because Vite forwards requests to it. To diagnose API errors
+inside the workspace, run `curl -i http://127.0.0.1:4090/api/v1/user`, then
+`curl -i http://127.0.0.1:3000/api/v1/user`. Both should return JSON with HTTP
+200. Connection refused on `4090` means the backend is not running. A proxy
+error on `3000` means Vite cannot reach it; unrelated HTML or a different 404
+response can mean the URL belongs to another application.
 
 If installing nvm or Node is prohibited and Node 24 is not already available,
 the question owner must provide a workspace with Node 24. For a standard coding
