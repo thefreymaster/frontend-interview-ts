@@ -199,10 +199,22 @@ export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 Open the **Ports** panel and use the preview action for port `3000`. HackerRank
 exposes predefined ports. Do not open the container's private IP address directly.
 
+`vite.config.ts` binds the frontend to `0.0.0.0` so HackerRank's preview proxy
+can reach it. Binding to `localhost` only accepts connections from inside the
+VM, even if a local `curl` succeeds. The configuration applies whether the
+workspace starts `npm run dev` or invokes Vite directly.
+
 `vite.config.ts` allows `.vm-provider.internal`, the internal hostname suffix
 used by HackerRank's preview proxy. If Vite reports a blocked host, confirm this
 setting is present in the HackerRank copy and restart Vite. Keep host checking
 enabled rather than setting `allowedHosts: true`.
+
+For **Server Is Not Reachable**, confirm the preview uses port `3000`, the
+configuration contains `host: "0.0.0.0"`, and Vite has been restarted. Inside
+the workspace, `curl -i http://127.0.0.1:3000/` should return the app's HTML.
+If that succeeds but the preview still fails, check the listener with
+`ss -ltnp | grep ':3000'`: it should show `0.0.0.0:3000`, not just
+`127.0.0.1:3000` or `[::1]:3000`.
 
 Backend startup command:
 

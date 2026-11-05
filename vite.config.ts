@@ -7,7 +7,8 @@ export default defineConfig({
   server: {
     port: 3000,
     strictPort: true,
-    host: "localhost",
+    // Bind all interfaces so HackerRank's preview proxy can reach the server.
+    host: "0.0.0.0",
     // HackerRank forwards preview requests using internal VM hostnames.
     allowedHosts: [".vm-provider.internal"],
     proxy: {
