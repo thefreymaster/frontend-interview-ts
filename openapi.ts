@@ -1,7 +1,7 @@
 export const openApiDocument = {
   openapi: "3.0.3",
   info: {
-    title: "Interview Mock API",
+    title: "TypeScript Interview Mock API",
     version: "1.0.0",
     description:
       "Mock pixel and user data for local development. Socket.IO also streams pixel quality changes every five seconds in a repeating one-minute cycle; see the README for event documentation. No authentication is required.",

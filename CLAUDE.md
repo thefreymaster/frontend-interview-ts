@@ -1,118 +1,80 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Overview
 
-This is a hypothetical React coding interview starter for a 100 by 100 pixel grid and a pixel detail page. The `Pixels` and `Pixel` components, HTTP pixel fetch functions, and `usePixels` hook are intentionally empty. The Express backend supplies 10,000 pixels with RGB sub-pixel values, a pixel detail endpoint, a mock user profile, and a repeating Socket.IO quality stream. An implemented frontend socket bridge keeps React Query caches in sync without rendering the exercise UI.
+This branch is a TypeScript-only coding interview starter for developers who
+do not work on frontends. It uses a Node.js CLI to report and inspect the same
+10,000-pixel dataset used by the React interview on `main`.
 
-Do not implement the grid, click navigation, HTTP fetching, or detail UI unless explicitly requested. Socket.IO transport and cache updates are implemented groundwork. Do not add or run tests unless requested.
+The functions in `src/api/api.ts` and `src/pixels.ts` intentionally throw
+`TODO` errors. Do not implement them unless explicitly requested. Do not add
+or run tests unless requested.
+
+There is no React, frontend, browser UI, Vite, routing, or CSS requirement.
+Do not reintroduce frontend dependencies.
 
 ## Development Commands
 
-### Setup and Installation
+- `bash setup.sh`: Install nvm if needed, select Node 24, and run `npm ci`.
+- `npm ci`: Install dependencies when Node 24 is already active.
+- `npm run server`: Start the supplied mock API at `http://localhost:4090`.
+- `npm run dev -- --help`: Show CLI usage.
+- `npm run dev -- summary`: Run the list/report exercise.
+- `npm run dev -- pixel --id 42`: Run the HTTP detail exercise.
+- `npm run dev -- watch --id 42`: Run the optional live-data exercise.
+- `npm run typecheck`: Type-check the whole project without emitting files.
+- `npm run typecheck:server`: Type-check the backend and shared types.
+- `npm run build`: Compile all TypeScript into `dist/`.
+- `npm start -- summary`: Run the compiled CLI.
+- `npm run lint`: Run Node/TypeScript ESLint rules.
 
-```bash
-# Install dependencies
-npm install
-```
-
-### Running the Application
-
-```bash
-# Start the development server (Frontend - Vite)
-npm run dev
-
-# Start the mock API server (Backend - Express)
-npm run server
-```
-
-The frontend is configured for `http://localhost:3000` and the backend API server for `http://localhost:4090`. Vite proxies `/api/v1` and `/socket.io` HTTP/WebSocket requests to the backend. `npm run dev` starts only the frontend; run `npm run server` separately. Vite fails on an occupied port rather than automatically selecting another port.
-
-### Building the Application
-
-```bash
-# Build for production
-npm run build
-```
-
-### Linting
-
-```bash
-# Run ESLint
-npm run lint
-```
+Run the backend in a separate terminal. The CLI connects directly to it, with
+an optional `--base-url` override. Use `.js` extensions in TypeScript imports
+to support NodeNext resolution and the compiled output.
 
 ## Architecture
 
-The application follows a standard React architecture with the following key components:
+- `index.ts`: Complete TypeScript Express API, Swagger UI, and Socket.IO
+  quality simulation. This is supplied infrastructure, not candidate work.
+- `openapi.ts`: Shared API documentation at `/api/v1/docs` and
+  `/api/v1/docs.json`. `/api-docs.json` remains a legacy alias.
+- `src/index.ts`: Supplied argument validation, command dispatch, JSON output,
+  error reporting, and stream shutdown.
+- `src/api/api.ts`: Candidate list and detail fetching. Returns
+  `Promise<IPixel[]>` and `Promise<IPixel>`; Node has built-in `fetch`.
+- `src/pixels.ts`: Candidate `summarizePixels` and optional `findPixel`.
+  Inputs are readonly and must not be mutated.
+- `src/stream.ts`: Complete framework-free Socket.IO client. Publishes full
+  snapshots and batches individual updates until `pixels:updated`.
+- `src/interfaces/`: Shared pixel model and typed server event contract.
 
-### Frontend Structure
+## Exercise Requirements
 
-- **React + TypeScript**: The frontend is built with React and TypeScript
-- **Vite**: Used as the build tool and development server
-- **React Query**: Handles data fetching, caching, and state management
-- **Styled Components**: Used for component styling
+1. Implement typed HTTP list and detail fetching with useful error handling.
+2. Summarize health counts, color counts, and average intensity for any array
+   size. Empty input returns zero counts and a zero average.
+3. Print the selected pixel's ID, health, metadata, and RGB values via the CLI.
+4. Handle invalid IDs, 404 responses, and an unavailable server.
+5. Optionally implement ID-based in-memory lookup for live reports, returning
+   `undefined` when the selected pixel is absent.
 
-### API Communication
+Commands currently fail with deliberate TODO messages until their exercise
+functions are implemented. This is expected, not a scaffold bug.
 
-- **Mock API**: A local TypeScript Express server provides pixel list/detail data and a user profile
-- **React Query**: The `usePixels` hook and HTTP fetch functions remain empty for the exercise
-- **Socket.IO**: `usePixelUpdates`, mounted in `App`, applies snapshots and per-pixel quality updates to React Query caches
-- **Socket provider**: `SocketIOProvider`, inside `QueryClientProvider`, owns the shared connection; `useSocketIO` exposes its socket, status, and error
-- **Routes**: `/` and `/pixels` render the empty `Pixels` component; `/pixels/:id` renders the empty `Pixel` component
+## Backend Behavior
 
-### Key Directories
-
-- `src/api/`: Contains intentionally empty pixel list and detail fetch functions
-- `src/components/`: React components for UI elements
-- `src/hooks/`: Custom React hooks (includes `usePixels` for data fetching)
-- `src/interfaces/`: Contains the shared `IPixel` data model and socket event contract
-- `src/providers/`: Contains the Socket.IO connection provider and typed context
-
-### Data Flow
-
-1. Once implemented, `Pixels` uses `usePixels` and `api.pixels.get` to fetch the pixel list
-2. The frontend displays the 10,000 returned pixels in a 100 by 100 grid
-3. Clicking a pixel navigates to `/pixels/:id`
-4. The detail page fetches the selected pixel using `api.pixels.getById` and displays its information
-5. The implemented `usePixelUpdates` socket bridge updates the list cache and existing detail caches as quality changes
-
-## Requirements
-
-The interview exercise, not the current scaffold, should satisfy these requirements:
-
-1. Implement list and detail HTTP fetching with loading and error states
-2. Display a 100 by 100 pixel grid
-3. Navigate to the selected pixel's detail route when clicked
-4. Display the pixel ID, health, metadata, and red/green/blue sub-pixel values
-5. Handle unknown pixel IDs
-
-## API Endpoints
-
-- `/api/v1/pixels`: Regenerates 10,000 pixels per request with sequential IDs, randomized RGB values, and exactly 94% green, 5% yellow, and 1% red
-- `/api/v1/pixels/:id`: Returns the matching pixel from the current live state or a JSON 404
-- `/api/v1/user`: Returns a fixed mock user profile
-- `/api/v1/docs`: Serves Swagger UI
-- `/api/v1/docs.json`: Serves the OpenAPI specification through the API proxy
-- `/api-docs.json`: Legacy OpenAPI specification path available directly on the backend
-- `/socket.io`: Socket.IO HTTP/WebSocket transport for pixel events
-
-## Development Notes
-
-- The API client in `src/api/api.ts` exposes empty `api.pixels.get` and `api.pixels.getById` functions
-- The `usePixels` hook in `src/hooks/usePixels.ts` is intentionally empty
-- `usePixelUpdates` subscribes to the provider's socket, removes only its own listeners, and resynchronizes on reconnect
-- `SocketIOProvider` connects and disconnects the shared socket; `useSocketIO` exposes connection status and errors
-- Query keys in `src/api/pixelQueryKeys.ts` are `["PIXELS"]` and `["PIXEL", numericId]`
-- The shared pixel interface is defined in `src/interfaces/pixels.ts`
-- `sub_pixels.red`, `sub_pixels.green`, and `sub_pixels.blue` are integers from 0 to 255
-- Every list request regenerates pixel data and shuffles the exact color distribution while keeping IDs fixed
-- Green pixels have `healthy: true`; yellow and red pixels have `healthy: false`
-- Every five seconds, the simulation rotates quality assignments while preserving the exact percentages; the 12-step pattern repeats every minute
-- HTTP list requests reset the cycle and broadcast the new snapshot to connected clients
-- Intensity and RGB values stay fixed within the cycle and are randomized on HTTP list refresh
-- Detail requests use the current live state shared across clients
-- `pixels:snapshot` carries `IPixel[]`; `pixel:update` carries an individual `IPixel`; `pixels:updated` marks the end of a tick
-- The frontend batches cache changes at the end of each tick rather than updating the grid for each socket event
-- Pixel responses set `Cache-Control: no-store`
+- `GET /api/v1/pixels` regenerates 10,000 pixels with fixed IDs and exactly
+  9,400 green, 500 yellow, and 100 red pixels.
+- Green pixels have `healthy: true`; yellow and red pixels have `healthy: false`.
+- Intensity is an integer from 0 to 100; RGB channels are integers from 0 to 255.
+- `GET /api/v1/pixels/:id` returns current live data or a JSON 404.
+- `GET /api/v1/user` returns a fixed mock profile.
+- Quality changes every five seconds in a 12-step, one-minute cycle.
+  Each step preserves color counts; only color and health change.
+- List requests reset the cycle, randomize intensity/RGB, and broadcast the
+  new snapshot to all clients.
+- `pixels:snapshot` carries `IPixel[]`, `pixel:update` carries `IPixel`, and
+  `pixels:updated` marks the end of a batch.
+- The stream helper resynchronizes on reconnect and returns a cleanup function.
+- Reports use stdout; loading/connection messages and errors use stderr.
+  One-off command failures exit nonzero; watch retries connection errors.

@@ -1,5 +1,5 @@
 {
-  "name": "interview",
+  "name": "typescript-interview",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -7,47 +7,29 @@
     "node": ">=24 <25"
   },
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "tsc -b && vite build",
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/src/index.js",
     "lint": "eslint .",
-    "preview": "vite preview",
     "server": "tsx index.ts",
+    "typecheck": "tsc --noEmit",
     "typecheck:server": "tsc -p tsconfig.server.json"
   },
   "dependencies": {
-    "@tanstack/react-query": "5.102.*",
     "express": "4.21.*",
-    "react": "19.0.*",
-    "react-dom": "19.0.*",
-    "react-router": "7.9.*",
     "socket.io": "4.8.*",
     "socket.io-client": "4.8.*",
-    "styled-components": "6.1.*5",
     "swagger-ui-express": "5.0.*"
   },
   "devDependencies": {
     "@eslint/js": "9.21.*",
     "@types/express": "5.0.*",
     "@types/node": "22.13.*",
-    "@types/react": "19.3.*",
-    "@types/react-dom": "19.3.*",
     "@types/swagger-ui-express": "4.1.*",
-    "@vitejs/plugin-react": "4.3.*",
     "eslint": "9.21.*",
-    "eslint-plugin-react-hooks": "5.1.*",
-    "eslint-plugin-react-refresh": "0.4.*",
     "globals": "15.15.*",
-    "nodemon": "3.1.*",
-    "ts-node": "10.9.*",
     "tsx": "4.23.*",
     "typescript": "~5.7.2",
-    "typescript-eslint": "8.24.*",
-    "vite": "6.2.*",
-    "@testing-library/user-event": "14.6.*",
-    "autoprefixer": "10.4.*",
-    "cross-env": "10.0.*",
-    "jest-junit": "16.0.*",
-    "postcss": "8.5.*",
-    "tailwindcss": "4.1.*2"
+    "typescript-eslint": "8.24.*"
   }
 }

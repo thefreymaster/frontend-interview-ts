@@ -1,298 +1,205 @@
-# Frontend Interview
+## Getting Started
 
-A hypothetical React and TypeScript coding interview: build a 100 by 100 pixel
-grid and navigate to a selected pixel's details. This repository only supplies
-the groundwork; the frontend solution is intentionally unfinished.
+Node 24 is required and pinned in `.nvmrc`. If it is already installed:
 
-## Architecture
-
-- **Frontend:** React 19 and TypeScript, served by Vite.
-- **Routing:** React Router defines page routes and a shared header layout in
-  `src/router/index.tsx`. `/` and `/pixels` render the empty `Pixels` component;
-  `/pixels/:id` renders the empty `Pixel` component.
-- **Data fetching:** TanStack React Query is configured in `src/main.tsx`.
-  `usePixels` remains an empty hook for the interview exercise.
-- **API exercise:** `get` and `getById` in `src/api/api.ts` are intentionally
-  empty. No HTTP requests are implemented in the frontend.
-- **Live updates:** `SocketIOProvider` owns the shared connection and is mounted
-  inside `QueryClientProvider` in `src/main.tsx`. `App` mounts `usePixelUpdates`,
-  which subscribes to that socket and updates React Query caches without
-  rendering UI. `useSocketIO` exposes the socket, connection status, and errors.
-- **Backend:** `index.ts` is a TypeScript Express server run with `tsx`.
-  It provides pixel list/detail data, a user profile, and a Socket.IO stream.
-  `openapi.ts` defines the API specification served by Swagger UI.
-
-The page components return `null`. Grid rendering, click navigation, and detail
-display are not implemented. The intended data flow for the exercise is:
-
-```text
-Pixels -> usePixels -> get -> GET /api/v1/pixels
-Pixel -> getById -> GET /api/v1/pixels/:id
-Socket.IO -> usePixelUpdates -> React Query cache -> pixel UI
+```bash
+npm ci
 ```
 
-| Location | Purpose |
-| --- | --- |
-| `src/api/api.ts` | Empty pixel list and detail fetch functions |
-| `src/hooks/usePixels.ts` | Empty list query hook to implement |
-| `src/hooks/usePixelUpdates.ts` | Implemented Socket.IO cache bridge |
-| `src/hooks/useSocketIO.ts` | Shared socket and connection-state hook |
-| `src/providers/SocketIOProvider.tsx` | Socket.IO connection lifecycle |
-| `src/providers/SocketIOContext.ts` | Typed socket context |
-| `src/api/pixelQueryKeys.ts` | Shared list/detail cache keys |
-| `src/components/Pixels/Pixels.tsx` | Empty grid page |
-| `src/components/Pixel/Pixel.tsx` | Empty detail page |
-| `src/components/Header/Header.tsx` | Shared header |
-| `src/interfaces/pixels.ts` | Shared `IPixel` data model |
-| `src/interfaces/pixelEvents.ts` | Typed Socket.IO event contract |
-| `src/router/index.tsx` | Page routes and shared layout |
-| `index.ts` | Express API routes |
-| `openapi.ts` | OpenAPI schemas and endpoint documentation |
-| `vite.config.ts` | Frontend port and development API proxy |
-| `tsconfig.server.json` | Server TypeScript configuration |
-
-## Local Development
-
-After cloning, run the setup script from the repository root:
+Otherwise, run:
 
 ```bash
 bash setup.sh
 ```
 
-The script installs nvm v0.40.8 if missing using the official installer, loads
-nvm, installs the Node 24 version pinned in `.nvmrc`, sets Node 24 as your default,
-and installs dependencies including dev dependencies. It requires Bash, curl,
-internet access, and permission to write to your nvm directory (normally
-`$HOME/.nvm`). Existing nvm installations are reused.
+The setup script installs nvm v0.40.8 if missing, installs Node 24, sets it as
+your default, and installs dependencies. It requires Bash, curl, internet
+access, and permission to write to your nvm directory (normally `$HOME/.nvm`).
+Open a new terminal afterward, or load nvm and run `nvm use` in the current one.
 
-Open a new terminal afterward, or activate nvm and Node 24 in the current one:
-
-```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh" && nvm use
-```
-
-`package.json` requires Node 24, and `.npmrc` enables strict engine checks so
-installing under Node 14 fails immediately instead of producing a broken setup.
-
-Run the backend and frontend in separate terminals:
+Start the supplied backend in one terminal:
 
 ```bash
 npm run server
 ```
 
+In another terminal, see the CLI usage:
+
 ```bash
-npm run dev
+npm run dev -- --help
 ```
 
-The frontend is configured for `http://localhost:3000`. The backend is configured
-for `http://localhost:4090`. Vite proxies `/api/v1` requests and `/socket.io`
-HTTP/WebSocket traffic to the backend.
+The following commands work after implementing the exercise functions:
 
-`npm run dev` starts only the frontend. Keep `npm run server` running in the
-second terminal for API, Swagger, and Socket.IO requests to work. Vite fails
-if port `3000` is occupied instead of silently moving to an unexposed port.
-For local development alongside another project, choose an unused frontend
-port with `npm run dev -- --port 3001`.
+```bash
+npm run dev -- summary
+npm run dev -- pixel --id 42
+npm run dev -- watch
+npm run dev -- watch --id 42
+```
 
-Backend documentation URLs:
+The default command is `summary`. Use `--base-url http://localhost:4090` to
+select an API server explicitly. Pixel IDs must be integers from 1 to 10000.
+Reports go to stdout as JSON; loading messages and errors go to stderr.
+One-off command failures exit with a nonzero status. Press Ctrl+C to stop
+watching and disconnect the socket.
 
-- Swagger UI: `http://localhost:4090/api/v1/docs`
-- OpenAPI JSON: `http://localhost:4090/api/v1/docs.json`
+There is no frontend server or development proxy. The CLI connects directly
+to the backend at `http://localhost:4090`.
 
-Both documentation paths work through the frontend proxy as well. In
-HackerRank, append `/api/v1/docs` to the frontend preview URL; Swagger fetches
-its definition from `/api/v1/docs.json`, which uses the same API proxy.
-The legacy `/api-docs.json` path remains available directly on the backend.
+## Interview Exercise
 
-The server defines these endpoints. All use `GET` and require no authentication:
+### Core Tasks
+
+1. Implement `get` and `getById` in `src/api/api.ts` using Node's built-in
+   `fetch`. Keep their typed return values and respect the `baseUrl` argument.
+   Handle network failures and non-success HTTP responses, including 404s,
+   with meaningful errors.
+2. Implement `summarizePixels` in `src/pixels.ts`. Return the total number of
+   pixels, healthy and unhealthy counts, counts for each color, and average
+   intensity. Use `healthy` for health counts and `meta_data.color` for color
+   counts. Accept any array size, do not mutate the input, and return zero for
+   every count and the average when the array is empty.
+3. Use `summary` to fetch and report the dataset. Use `pixel --id 42` to fetch
+   and display that pixel's ID, health, metadata, and RGB sub-pixel values.
+   The CLI already wires these commands to your functions.
+4. Verify that invalid IDs, unknown pixels, and an unavailable server produce
+   useful errors rather than unhandled exceptions.
+
+The summary has this shape. The average below is illustrative and varies with
+the randomly generated data:
+
+```json
+{
+  "total": 10000,
+  "healthy": 9400,
+  "unhealthy": 600,
+  "colors": {
+    "green": 9400,
+    "yellow": 500,
+    "red": 100
+  },
+  "averageIntensity": 50.12
+}
+```
+
+### Optional Extension
+
+Implement `findPixel` in `src/pixels.ts` using the pixel's ID, returning
+`undefined` when it is absent and leaving the input unchanged. Run
+`watch --id 42` to report a summary and the selected pixel as quality changes.
+An absent selected pixel is printed as `null`.
+
+The supplied stream helper handles connection lifecycle, full snapshots,
+batched updates, and reconnection. Candidates do not need to know Socket.IO.
+The interesting part is consuming typed data and keeping the selected pixel
+and report in sync. Connection errors are logged while the client retries.
+
+For a shorter interview, stop after the core tasks. Discuss response
+validation, request timeouts, lookup complexity, or automated testing if time
+permits; no additional libraries are necessary to complete the exercise.
+
+## Project Layout
+
+| Location | Purpose |
+| --- | --- |
+| `src/api/api.ts` | Candidate: typed list and detail HTTP fetch functions |
+| `src/pixels.ts` | Candidate: summary and optional in-memory lookup |
+| `src/index.ts` | Supplied CLI argument parsing, output, and error handling |
+| `src/stream.ts` | Supplied framework-free Socket.IO connection and batching |
+| `src/interfaces/pixels.ts` | Shared `IPixel` data model |
+| `src/interfaces/pixelEvents.ts` | Typed Socket.IO event contract |
+| `index.ts` | Supplied Express mock API and quality simulation |
+| `openapi.ts` | OpenAPI specification |
+
+```text
+summary -> get -> GET /api/v1/pixels -> summarizePixels -> JSON
+pixel --id 42 -> getById -> GET /api/v1/pixels/42 -> JSON
+watch -> Socket.IO -> batched pixels -> summarizePixels / findPixel -> JSON
+```
+
+## Mock API
+
+All endpoints use `GET` and require no authentication:
 
 | Endpoint | Response |
 | --- | --- |
-| `/api/v1/pixels` | 10,000 freshly generated pixels for a 100 by 100 grid |
-| `/api/v1/pixels/:id` | One pixel from the latest snapshot, or a JSON 404 |
+| `/api/v1/pixels` | 10,000 freshly generated pixels |
+| `/api/v1/pixels/:id` | One pixel from the current live state, or a JSON 404 |
 | `/api/v1/user` | Mock user ID, name, email, and role |
+| `/api/v1/docs` | Swagger UI |
+| `/api/v1/docs.json` | OpenAPI JSON |
 
-Every request to `/api/v1/pixels` regenerates the data while keeping IDs from
-`1` to `10000`. Each response contains exactly 9,400 green pixels (94%), 500
-yellow pixels (5%), and 100 red pixels (1%), randomly distributed across IDs.
-Intensity and RGB values are randomized on each refresh.
+Open Swagger at `http://localhost:4090/api/v1/docs`. The legacy
+`/api-docs.json` path is also available on the backend.
 
-The detail endpoint returns the current live pixel state, shared across clients,
-without regenerating it. Before the first list request, it uses data generated
-at startup and changed by the simulation. Pixel responses disable HTTP caching.
-
-Each pixel includes:
+Every list request regenerates the dataset, keeping IDs from 1 to 10000.
+Each response has exactly 9,400 green pixels (94%), 500 yellow pixels (5%),
+and 100 red pixels (1%), randomly distributed across IDs. Green pixels are
+healthy; yellow and red pixels are not. Pixel responses disable HTTP caching.
 
 | Field | Description |
 | --- | --- |
 | `id` | Sequential pixel identifier |
-| `healthy` | `true` for green pixels; `false` for yellow or red pixels |
+| `healthy` | Whether the pixel is green |
 | `meta_data.intensity` | Integer from 0 to 100 |
-| `meta_data.color` | Mock label: `green`, `yellow`, or `red` |
+| `meta_data.color` | `green`, `yellow`, or `red` |
 | `sub_pixels.red` | Red channel value from 0 to 255 |
 | `sub_pixels.green` | Green channel value from 0 to 255 |
 | `sub_pixels.blue` | Blue channel value from 0 to 255 |
 
-## Socket.IO Stream
+Detail requests do not regenerate data. They return the current live state,
+including changes made since startup or the latest list request.
 
-The server changes pixel quality every five seconds using a 12-step pattern
-that repeats every minute. Each step preserves exactly 9,400 green, 500 yellow,
-and 100 red pixels. Only color and the corresponding `healthy` flag change
-during the cycle; intensity and RGB values stay fixed until an HTTP list refresh.
-Fetching the list resets the cycle with newly randomized data for all clients.
+### Live Updates
 
-The same server on port `4090` handles HTTP and Socket.IO at `/socket.io`.
-Socket.IO clients are required; this is not a plain WebSocket endpoint.
+The same backend handles Socket.IO at `/socket.io`; it is not a plain
+WebSocket endpoint. Quality changes every five seconds in a 12-step pattern
+that repeats every minute. Each step preserves the exact color counts.
+Only color and health change during the cycle; intensity and RGB values stay
+fixed until a list request regenerates them.
 
 | Server Event | Payload | Purpose |
 | --- | --- | --- |
-| `pixels:snapshot` | `IPixel[]` | Full state on connection, reconnection, and HTTP list refresh |
-| `pixel:update` | `IPixel` | Complete pixel data when that pixel's quality changes |
-| `pixels:updated` | None | Marks the end of a simulation step |
+| `pixels:snapshot` | `IPixel[]` | Full state on connection, reconnection, or list refresh |
+| `pixel:update` | `IPixel` | Complete data for a changed pixel |
+| `pixels:updated` | None | End of a simulation step |
 
-The frontend buffers individual pixel events and applies them together at the
-end of each step, avoiding a cache refresh for every pixel event. A reconnect
-receives a fresh snapshot. The bridge removes only its own listeners when it
-unmounts; the provider disconnects the shared socket when the app unmounts.
+The stream helper buffers individual changes and publishes one consistent
+array per completed step. A snapshot replaces the array and clears pending
+updates. A list request resets the simulation and broadcasts its snapshot to
+all clients, so another client's refresh also affects a running watch.
+Summary counts stay constant; `watch --id 42` makes individual changes visible.
 
-Components inside the provider can use `useSocketIO()` to access `socket`,
-`status` (`connecting`, `connected`, `disconnected`, or `error`), and `error`.
-The socket connects to the frontend's origin through the Vite proxy and
-automatically attempts reconnection after a connection failure.
-
-The interview's query hooks should use the keys in `src/api/pixelQueryKeys.ts`:
-`["PIXELS"]` for the list and `["PIXEL", id]` for details, with a numeric `id`.
-The bridge seeds the list cache and updates any existing detail caches.
-The empty page components and HTTP fetch functions are still left to implement.
-
-Other available commands:
+## Other Commands
 
 | Command | Purpose |
 | --- | --- |
-| `npm run typecheck:server` | Type-check the server without starting it |
-| `npm run build` | Type-check all projects and build the frontend |
-| `npm run lint` | Run ESLint |
-| `npm run preview` | Preview the built frontend |
+| `npm run typecheck` | Type-check all TypeScript without emitting files |
+| `npm run typecheck:server` | Type-check only the backend and its shared types |
+| `npm run build` | Compile the CLI and backend into `dist/` |
+| `npm start -- summary` | Run the compiled CLI (after building) |
+| `npm run lint` | Run Node/TypeScript ESLint rules |
+
+The compiled backend can also run with `node dist/index.js`.
 
 ## HackerRank Setup
 
-The repository's Node version requirement does not change HackerRank's runtime
-automatically. If the project workspace permits installing nvm and Node,
-configure its initialization/setup command to run this from the repository root:
+Use a Node.js/TypeScript project workspace with a terminal; no browser preview
+or exposed frontend port is needed. The workspace must support Node 24.
+If runtime installation is permitted, use `bash setup.sh` as the setup command.
 
-```bash
-bash setup.sh
-```
-
-The script checks that the active Node version is 24. Setup and application
-commands may run in separate shells, so explicitly load nvm and select the
-pinned version in each startup command as well.
-
-Frontend startup command:
-
-```bash
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-. "$NVM_DIR/nvm.sh" && nvm use && npm run dev
-```
-
-Open the **Ports** panel and use the preview action for port `3000`. HackerRank
-exposes predefined ports. Do not open the container's private IP address directly.
-
-`vite.config.ts` binds the frontend to `0.0.0.0` so HackerRank's preview proxy
-can reach it. Binding to `localhost` only accepts connections from inside the
-VM, even if a local `curl` succeeds. The configuration applies whether the
-workspace starts `npm run dev` or invokes Vite directly.
-
-`vite.config.ts` allows `.vm-provider.internal`, the internal hostname suffix
-used by HackerRank's preview proxy. If Vite reports a blocked host, confirm this
-setting is present in the HackerRank copy and restart Vite. Keep host checking
-enabled rather than setting `allowedHosts: true`.
-
-For **Server Is Not Reachable**, confirm the preview uses port `3000`, the
-configuration contains `host: "0.0.0.0"`, and Vite has been restarted. Inside
-the workspace, `curl -i http://127.0.0.1:3000/` should return the app's HTML.
-If that succeeds but the preview still fails, check the listener with
-`ss -ltnp | grep ':3000'`: it should show `0.0.0.0:3000`, not just
-`127.0.0.1:3000` or `[::1]:3000`.
-
-Backend startup command:
+Setup and startup may run in different shells. Load nvm in each terminal:
 
 ```bash
 export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 . "$NVM_DIR/nvm.sh" && nvm use && npm run server
 ```
 
-Keep the backend running in a separate terminal; port `4090` does not need a
-public preview because Vite forwards requests to it. To diagnose API errors
-inside the workspace, run `curl -i http://127.0.0.1:4090/api/v1/user`, then
-`curl -i http://127.0.0.1:3000/api/v1/user`. Both should return JSON with HTTP
-200. Connection refused on `4090` means the backend is not running. A proxy
-error on `3000` means Vite cannot reach it; unrelated HTML or a different 404
-response can mean the URL belongs to another application.
+Keep the backend running, then use the CLI commands in a second terminal
+with Node 24 active. Check connectivity inside the workspace with
+`curl -i http://127.0.0.1:4090/api/v1/user` or inspect the specification with
+`curl http://127.0.0.1:4090/api/v1/docs.json`.
 
-If installing nvm or Node is prohibited and Node 24 is not already available,
-the question owner must provide a workspace with Node 24. For a standard coding
-question rather than a project workspace, the Node version is controlled by
-HackerRank's available language runtimes, not these repository files.
-
-## Interview Exercise
-
-1. Implement the empty list and detail fetch functions.
-2. Use the returned pixels to render a 100 by 100 grid in `Pixels`.
-   Each pixel should be 5px wide and 5px high, have rounded corners, and use
-   `meta_data.color` as its background color.
-3. Clicking a pixel should navigate to `/pixels/:id`.
-4. Display the selected pixel's health, metadata, and RGB sub-pixel values in
-   `Pixel`.
-5. Handle loading, error, and unknown-pixel states.
-6. Render incoming quality changes without losing the grid layout or selected
-   pixel.
-
-## Page Layout
-
-These diagrams illustrate the intended pages, not implemented UI.
-
-Grid page (`/` or `/pixels`):
-
-```text
-+--------------------------------------------------------------+
-| [Logo] Pixel Interview                     Interview starter |
-+--------------------------------------------------------------+
-| Pixels                                                       |
-|                                                              |
-|     o o o o o o o o ... o   <- 100 columns                   |
-|     o o o o o o o o ... o                                    |
-|     o o o o o o o o ... o                                    |
-|     .                                                        |
-|     .                      100 rows                          |
-|     o o o o o o o o ... o                                    |
-|                                                              |
-| Each o is a colored, rounded 5px by 5px cell.                |
-| Click a cell to navigate to /pixels/:id.                     |
-+--------------------------------------------------------------+
-```
-
-Detail page (`/pixels/:id`):
-
-```text
-+--------------------------------------------------------------+
-| [Logo] Pixel Interview                     Interview starter |
-+--------------------------------------------------------------+
-| < Back to pixels                                             |
-|                                                              |
-| Pixel #42                                                    |
-|                                                              |
-| Health:       true                                           |
-| Intensity:    75                                             |
-| Color:        green                                          |
-|                                                              |
-| RGB sub-pixel values                                         |
-| Red: 128          Green: 64          Blue: 255               |
-+--------------------------------------------------------------+
-```
-
-The detail values are illustrative. Use the selected pixel's API response.
-
-These are interview requirements, not completed features. Keep the components
-and pixel fetch functions empty until the exercise is implemented.
+If installing Node is prohibited, the question owner must provide a workspace
+with Node 24. Repository settings do not change HackerRank's runtime.
