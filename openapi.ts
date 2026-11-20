@@ -1,16 +1,23 @@
+const todoResponse = {
+  description: "Candidate handler is not implemented yet",
+  content: {
+    "application/json": {
+      schema: { $ref: "#/components/schemas/Error" },
+      example: { message: "TODO: implement the endpoint" },
+    },
+  },
+};
+
 export const openApiDocument = {
   openapi: "3.0.3",
   info: {
-    title: "TypeScript Interview Mock API",
+    title: "TypeScript Pixel Interview API",
     version: "1.0.0",
     description:
-      "Mock pixel and user data for local development. Socket.IO also streams pixel quality changes every five seconds in a repeating one-minute cycle; see the README for event documentation. No authentication is required.",
+      "Three candidate endpoints using a supplied 10,000-pixel dataset. Handlers initially return 501 TODO responses. No authentication is required.",
   },
   servers: [{ url: "/", description: "Current API server" }],
-  tags: [
-    { name: "Pixels", description: "Generated mock pixel data" },
-    { name: "User", description: "Mock current-user profile" },
-  ],
+  tags: [{ name: "Pixels", description: "Generated mock pixel data" }],
   paths: {
     "/api/v1/pixels": {
       get: {
@@ -18,7 +25,7 @@ export const openApiDocument = {
         operationId: "getPixels",
         summary: "Get 10,000 pixels for a 100 by 100 grid",
         description:
-          "Regenerates hypothetical interview data on every request with exactly 9,400 green pixels (94%), 500 yellow pixels (5%), and 100 red pixels (1%). Color assignments are shuffled while IDs stay fixed. Intensity and RGB sub-pixel values are randomized. Green pixels are healthy; yellow and red pixels are not. Resets the quality simulation and broadcasts the new snapshot to connected Socket.IO clients.",
+          "Returns the current shared dataset, generated at startup with exactly 9,400 green pixels, 500 yellow pixels, and 100 red pixels. Requests do not regenerate the data.",
         responses: {
           "200": {
             description: "An array of 10,000 pixels with sequential IDs",
@@ -33,6 +40,45 @@ export const openApiDocument = {
               },
             },
           },
+          "501": todoResponse,
+        },
+      },
+    },
+    "/api/v1/pixels/grid": {
+      get: {
+        tags: ["Pixels"],
+        operationId: "getPixelGrid",
+        summary: "Get 100 rows of 100 pixels",
+        description:
+          "Reshapes the shared dataset in input order without mutation. Each row is a separate array; each cell contains the complete pixel object.",
+        responses: {
+          "200": {
+            description: "A 100 by 100 two-dimensional pixel array",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "array",
+                  minItems: 100,
+                  maxItems: 100,
+                  items: {
+                    type: "array",
+                    minItems: 100,
+                    maxItems: 100,
+                    items: { $ref: "#/components/schemas/Pixel" },
+                  },
+                },
+              },
+            },
+          },
+          "500": {
+            description: "The supplied dataset cannot form a 100 by 100 grid",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
+          },
+          "501": todoResponse,
         },
       },
     },
@@ -42,14 +88,18 @@ export const openApiDocument = {
         operationId: "getPixel",
         summary: "Get a pixel by ID",
         description:
-          "Returns the pixel from the current live state shared across clients, including Socket.IO quality changes. Before the first list request, uses startup data and the running simulation. Detail requests do not regenerate data.",
+          "Returns one pixel from the shared dataset by ID, not array position. IDs must be positive safe integers; absent IDs return 404.",
         parameters: [
           {
             name: "id",
             in: "path",
             required: true,
             description: "The pixel ID from the list response",
-            schema: { type: "integer", minimum: 1, maximum: 10000 },
+            schema: {
+              type: "integer",
+              minimum: 1,
+              maximum: Number.MAX_SAFE_INTEGER,
+            },
             example: 1,
           },
         ],
@@ -62,8 +112,17 @@ export const openApiDocument = {
               },
             },
           },
+          "400": {
+            description: "The ID is not a positive safe integer",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+                example: { message: "Pixel ID must be a positive integer" },
+              },
+            },
+          },
           "404": {
-            description: "The pixel ID is invalid or does not exist",
+            description: "No pixel has the requested ID",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/Error" },
@@ -71,29 +130,7 @@ export const openApiDocument = {
               },
             },
           },
-        },
-      },
-    },
-    "/api/v1/user": {
-      get: {
-        tags: ["User"],
-        operationId: "getUser",
-        summary: "Get the mock current user",
-        responses: {
-          "200": {
-            description: "A fixed mock user profile",
-            content: {
-              "application/json": {
-                schema: { $ref: "#/components/schemas/User" },
-                example: {
-                  id: "user-001",
-                  name: "Alex Morgan",
-                  email: "alex.morgan@example.com",
-                  role: "viewer",
-                },
-              },
-            },
-          },
+          "501": todoResponse,
         },
       },
     },
@@ -145,20 +182,6 @@ export const openApiDocument = {
         required: ["message"],
         properties: {
           message: { type: "string", example: "Pixel not found" },
-        },
-      },
-      User: {
-        type: "object",
-        required: ["id", "name", "email", "role"],
-        properties: {
-          id: { type: "string", example: "user-001" },
-          name: { type: "string", example: "Alex Morgan" },
-          email: {
-            type: "string",
-            format: "email",
-            example: "alex.morgan@example.com",
-          },
-          role: { type: "string", enum: ["viewer", "admin"], example: "viewer" },
         },
       },
     },

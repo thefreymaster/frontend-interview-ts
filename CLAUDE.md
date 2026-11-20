@@ -3,12 +3,14 @@
 ## Project Overview
 
 This branch is a TypeScript-only coding interview starter for developers who
-do not work on frontends. It uses a Node.js CLI to report and inspect the same
-10,000-pixel dataset used by the React interview on `main`.
+do not work on frontends. The 45-minute interview covers three Express
+endpoints (20 minutes), tests (15 minutes), and a lookup-scaling follow-up
+(10 minutes).
 
-The functions in `src/api/api.ts` and `src/pixels.ts` intentionally throw
-`TODO` errors. Do not implement them unless explicitly requested. Do not add
-or run tests unless requested.
+The handlers in `src/api/pixels.ts` intentionally return 501 TODO responses.
+`toPixelGrid` and optional `findPixel` in `src/utils/pixels.ts` intentionally
+throw TODO errors. Do not complete candidate implementations or TODO tests
+unless explicitly requested. Supplied infrastructure tests may be run.
 
 There is no React, frontend, browser UI, Vite, routing, or CSS requirement.
 Do not reintroduce frontend dependencies.
@@ -17,64 +19,73 @@ Do not reintroduce frontend dependencies.
 
 - `bash setup.sh`: Install nvm if needed, select Node 24, and run `npm ci`.
 - `npm ci`: Install dependencies when Node 24 is already active.
-- `npm run server`: Start the supplied mock API at `http://localhost:4090`.
+- `npm run server`: Start the supplied Express app at `http://localhost:4090`.
 - `npm run dev -- --help`: Show CLI usage.
-- `npm run dev -- summary`: Run the list/report exercise.
+- `npm run dev -- list`: Request the pixel array through the supplied CLI.
+- `npm run dev -- grid`: Run the 100-by-100 grid construction exercise.
 - `npm run dev -- pixel --id 42`: Run the HTTP detail exercise.
-- `npm run dev -- watch --id 42`: Run the optional live-data exercise.
+- `npm test`: Run setup tests and candidate TODO tests with Node's test runner.
 - `npm run typecheck`: Type-check the whole project without emitting files.
 - `npm run typecheck:server`: Type-check the backend and shared types.
 - `npm run build`: Compile all TypeScript into `dist/`.
-- `npm start -- summary`: Run the compiled CLI.
+- `npm start -- list`: Run the compiled CLI.
 - `npm run lint`: Run Node/TypeScript ESLint rules.
 
-Run the backend in a separate terminal. The CLI connects directly to it, with
-an optional `--base-url` override. Use `.js` extensions in TypeScript imports
-to support NodeNext resolution and the compiled output.
+Core work is verified with HTTP requests and the supplied test harness.
+The CLI is a supplied HTTP client, not candidate work. Use `.js` extensions
+in TypeScript imports for NodeNext resolution.
 
 ## Architecture
 
-- `index.ts`: Complete TypeScript Express API, Swagger UI, and Socket.IO
-  quality simulation. This is supplied infrastructure, not candidate work.
+- `index.ts`: Supplied server entry point; listens on port 4090 and handles
+  shutdown. Do not import it from tests or candidate code.
+- `src/app.ts`: Supplied app factory, Router mounting, Swagger UI, and JSON
+  error handling. It does not start a server.
+- `src/data/pixels.ts`: Supplied generation and shared pixel state. Import
+  `getPixels` to read the current dataset without starting a server or timer.
+  `regeneratePixels` explicitly replaces the dataset. Requests do not
+  regenerate data, and there are no timers or streaming updates.
 - `openapi.ts`: Shared API documentation at `/api/v1/docs` and
   `/api/v1/docs.json`. `/api-docs.json` remains a legacy alias.
-- `src/index.ts`: Supplied argument validation, command dispatch, JSON output,
-  error reporting, and stream shutdown.
-- `src/api/api.ts`: Candidate list and detail fetching. Returns
-  `Promise<IPixel[]>` and `Promise<IPixel>`; Node has built-in `fetch`.
-- `src/pixels.ts`: Candidate `summarizePixels` and optional `findPixel`.
-  Inputs are readonly and must not be mutated.
-- `src/stream.ts`: Complete framework-free Socket.IO client. Publishes full
-  snapshots and batches individual updates until `pixels:updated`.
-- `src/interfaces/`: Shared pixel model and typed server event contract.
+- `src/index.ts`: Supplied CLI argument parsing and HTTP requests.
+- `src/api/index.ts`: Preserves the grouped `api.pixels` Router export and
+  supplies `createApi` for fixture-based apps.
+- `src/api/pixels.ts`: Mounted candidate Router. `createPixelsRouter` accepts
+  a `getPixels` callback so tests can supply or replace the dataset.
+- `src/utils/pixels.ts`: Candidate grid and optional lookup helpers. Inputs
+  are readonly and must not be mutated.
+- `src/interfaces/pixels.ts`: Shared pixel model.
+- `test/helpers/api.ts`: Ephemeral HTTP server and fixture replacement.
+- `test/fixtures/pixels.ts`: Deterministic fixtures.
+- `test/pixels.test.ts`: HTTP harness example and candidate TODO cases.
+- `test/data.test.ts`: Supplied dataset regression checks.
 
 ## Exercise Requirements
 
-1. Implement typed HTTP list and detail fetching with useful error handling.
-2. Summarize health counts, color counts, and average intensity for any array
-   size. Empty input returns zero counts and a zero average.
-3. Print the selected pixel's ID, health, metadata, and RGB values via the CLI.
-4. Handle invalid IDs, 404 responses, and an unavailable server.
-5. Optionally implement ID-based in-memory lookup for live reports, returning
-   `undefined` when the selected pixel is absent.
+1. Complete `GET /api/v1/pixels` to return the supplied dataset.
+2. Complete `GET /api/v1/pixels/:id` to return one matching object. Invalid
+   IDs produce 400; absent positive integer IDs produce 404.
+3. Complete `GET /api/v1/pixels/grid` and `toPixelGrid` to convert exactly
+   10,000 pixels into 100 independent rows of 100 cells,
+   preserving input order and leaving the input unchanged. Reject any other
+   input size. Pixel objects may be shared.
+4. Fill in tests for response contracts, validation, lookup, grid boundaries,
+   row identity, input sizes, and non-mutation.
+5. Discuss or implement faster repeated lookup and correct invalidation after
+   a dataset replacement. This follow-up is not a fourth endpoint.
 
-Commands currently fail with deliberate TODO messages until their exercise
-functions are implemented. This is expected, not a scaffold bug.
+There is no summary endpoint, frontend, streaming requirement, or candidate
+fetch work. Keep `/grid` before `/:id`. `npm test` deliberately reports TODO
+cases until candidates write them; passing setup tests alone is not completion.
 
 ## Backend Behavior
 
-- `GET /api/v1/pixels` regenerates 10,000 pixels with fixed IDs and exactly
+- `getPixels()` supplies 10,000 pixels with fixed IDs and exactly
   9,400 green, 500 yellow, and 100 red pixels.
 - Green pixels have `healthy: true`; yellow and red pixels have `healthy: false`.
 - Intensity is an integer from 0 to 100; RGB channels are integers from 0 to 255.
-- `GET /api/v1/pixels/:id` returns current live data or a JSON 404.
-- `GET /api/v1/user` returns a fixed mock profile.
-- Quality changes every five seconds in a 12-step, one-minute cycle.
-  Each step preserves color counts; only color and health change.
-- List requests reset the cycle, randomize intensity/RGB, and broadcast the
-  new snapshot to all clients.
-- `pixels:snapshot` carries `IPixel[]`, `pixel:update` carries `IPixel`, and
-  `pixels:updated` marks the end of a batch.
-- The stream helper resynchronizes on reconnect and returns a cleanup function.
-- Reports use stdout; loading/connection messages and errors use stderr.
-  One-off command failures exit nonzero; watch retries connection errors.
+- Three pixel routes are mounted and initially return JSON TODO responses
+  with status 501.
+- Swagger is at `/api/v1/docs`; its JSON is at `/api/v1/docs.json`.
+- The supplied CLI prints JSON to stdout and errors to stderr, exiting
+  nonzero for failures.

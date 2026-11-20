@@ -10,6 +10,7 @@
     "dev": "tsx src/index.ts",
     "build": "tsc",
     "start": "node dist/src/index.js",
+    "test": "node --import tsx --test test/*.test.ts",
     "lint": "eslint .",
     "server": "tsx index.ts",
     "typecheck": "tsc --noEmit",
@@ -17,8 +18,6 @@
   },
   "dependencies": {
     "express": "4.21.*",
-    "socket.io": "4.8.*",
-    "socket.io-client": "4.8.*",
     "swagger-ui-express": "5.0.*"
   },
   "devDependencies": {
